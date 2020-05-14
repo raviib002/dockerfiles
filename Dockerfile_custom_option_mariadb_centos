@@ -1,0 +1,66 @@
+#### Pulling the image from docker hub repository
+FROM mariadb:5.5.64 
+#### Updating the packages
+RUN yum -y update
+#### installing the basic packages
+RUN yum install -y lynx wget rsync vim bash-completion curl unzip net-tools
+#### customized my.cnf file for the project
+RUN echo " " >> /etc/my.cnf
+RUN echo "[mysqld]" >> /etc/my.cnf
+RUN echo "datadir=/var/lib/mysql" >> /etc/my.cnf
+RUN echo "socket=/var/lib/mysql/mysql.sock" >> /etc/my.cnf
+RUN echo " " >> /etc/my.cnf
+RUN echo "symbolic-links=0" >> /etc/my.cnf
+RUN echo " " >> /etc/my.cnf
+RUN echo " " >> /etc/my.cnf
+RUN echo "query_cache_type=1" >> /etc/my.cnf
+RUN echo "query_cache_limit=1048576" >> /etc/my.cnf
+RUN echo "thread_cache_size = 10000" >> /etc/my.cnf
+RUN echo "table_open_cache = 12615" >> /etc/my.cnf
+RUN echo "open_files_limit = 25230" >> /etc/my.cnf
+RUN echo "table_cache= 25230" >> /etc/my.cnf
+RUN echo "max_allowed_packet = 512M" >> /etc/my.cnf
+RUN echo "innodb_buffer_pool_size=1024M" >> /etc/my.cnf
+RUN echo "query_cache_size=64M" >> /etc/my.cnf
+RUN echo " " >> /etc/my.cnf
+RUN echo " " >> /etc/my.cnf
+RUN echo "[mysqld_safe]" >> /etc/my.cnf
+RUN echo "log-error=/var/log/mariadb/mariadb.log" >> /etc/my.cnf
+RUN echo "pid-file=/var/run/mariadb/mariadb.pid" >> /etc/my.cnf
+RUN echo "long_query_time = 1" >> /etc/my.cnf
+RUN echo "slow_query_log = ON" >> /etc/my.cnf
+RUN echo "slow_query_log_file=/var/log/mysqld.slow.log" >> /etc/my.cnf
+RUN echo " " >> /etc/my.cnf
+RUN echo "!includedir /etc/my.cnf.d" >> /etc/my.cnf
+#### customized client.cnf file for the project
+RUN touch /etc/my.cnf.d/client.cnf
+RUN echo "[client]" >> /etc/my.cnf.d/client.cnf
+RUN echo " " >> /etc/my.cnf.d/client.cnf
+RUN echo "[client-mariadb]" >> /etc/my.cnf.d/client.cnf
+#### customized mysql-client.cnf file for the project
+RUN touch /etc/my.cnf.d/mysql-clients.cnf
+RUN echo "[mysql]" >> /etc/my.cnf.d/mysql-clients.cnf
+RUN echo "[mysql_upgrade]" >> /etc/my.cnf.d/mysql-clients.cnf
+RUN echo "[mysqladmin]" >> /etc/my.cnf.d/mysql-clients.cnf
+RUN echo "[mysqlbinlog]" >> /etc/my.cnf.d/mysql-clients.cnf
+RUN echo "[mysqlcheck]" >> /etc/my.cnf.d/mysql-clients.cnf
+RUN echo "[mysqldump]" >> /etc/my.cnf.d/mysql-clients.cnf
+RUN echo "[mysqlimport]" >> /etc/my.cnf.d/mysql-clients.cnf
+RUN echo "[mysqlshow]" >> /etc/my.cnf.d/mysql-clients.cnf
+RUN echo "[mysqlslap]" >> /etc/my.cnf.d/mysql-clients.cnf
+#### customized server.cnf file for the project
+RUN touch /etc/my.cnf.d/server.cnf
+RUN echo "[server]" >> /etc/my.cnf.d/server.cnf
+RUN echo "[mysqld]" >> /etc/my.cnf.d/server.cnf
+RUN echo "[embedded]" >> /etc/my.cnf.d/server.cnf
+RUN echo "[mysqld-5.5]" >> /etc/my.cnf.d/server.cnf
+RUN echo "[mariadb]" >> /etc/my.cnf.d/server.cnf
+RUN echo "[mariadb-5.5]" >> /etc/my.cnf.d/server.cnf
+#### Exporting the ports outside
+EXPOSE 3306
+CMD ["mysqld"]
+######################################################################
+#### creating the container for mariadb and resetting the root password of mariadb
+###docker run --name=mariadb -itd -p 3306:3306 -e MYSQL_ROOT_PASSWORD=mysql <image name/id>
+#### command for login to the container mariadb from local machine
+###mysql --host=127.0.0.1 --port=3306 -u root -p 
