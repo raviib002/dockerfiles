@@ -20,26 +20,7 @@ RUN wget -q https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.r
 RUN rpm -i remi-release-7.rpm epel-release-latest-7.noarch.rpm
 RUN yum-config-manager --enable remi-php70
 RUN yum install -y php.x86_64 php-bcmath.x86_64 php-cli.x86_64 php-common.x86_64 php-fedora-autoloader.noarch php-gd.x86_64 php-gmp.x86_64 php-intl.x86_64 php-json.x86_64 php-mbstring.x86_64 php-mcrypt.x86_64 php-mysqlnd.x86_64 php-opcache.x86_64 php-pdo.x86_64 php-pecl-igbinary.x86_64 php-pecl-memcached.x86_64 php-pecl-msgpack.x86_64 php-pecl-xdebug.x86_64 php-pecl-zip.x86_64 php-php-gettext.noarch php-process.x86_64 php-soap.x86_64 php-tcpdf.noarch php-tcpdf-dejavu-sans-fonts.noarch php-tidy.x86_64 php-xml.x86_64 php-xmlrpc.x86_64 phpMyAdmin.noarch
-RUN sed -i 's/Require ip 127.0.0.1/Require all granted/g' /etc/httpd/conf.d/phpMyAdmin.conf 
-RUN sed -i 's/Require ip ::1/#Require ip ::1/g' /etc/httpd/conf.d/phpMyAdmin.conf 
-###Exporting the port to the externel
-EXPOSE  8091
-EXPOSE  3306
-###Creating the new ssh user for accessing the application
-#RUN useradd -p $(openssl passwd -1 wordprestest) wordprestest
-RUN useradd wordprestest1
-RUN echo "wordprestest1:wordprestest1" | chpasswd
-###Directory Environment for project
-RUN mkdir -p /home/wordprestest1/{backups,public_html,logs,tmp}
-###Sample test file for testing the environment
-RUN touch /home/wordprestest1/public_html/index.html
-###adding the content to the sample file
-RUN echo "this is the docker apache test page for wrdtstsite.edflix.ch site......" > /home/wordprestest1/public_html/index.html
-###changing the ownership of the directories
-RUN chown -R wordprestest1:wordprestest1 /home/wordprestest1/
-###changing the permissions of the project directory
-RUN chmod -R 755 /home/wordprestest1/
-RUN chmod -R 775 /home/wordprestest1/public_html/
+#################################### Custome options ###########################
 ##### custom apache port ##########################
 RUN sed -i 's/Listen 80/Listen 8091/g' /etc/httpd/conf/httpd.conf
 ###customizing the httpd configuration file for multiple projects
@@ -55,7 +36,7 @@ RUN echo "KeepAlive on" >> /etc/httpd/conf/httpd.conf
 RUN echo "KeepAliveTimeout 7" >> /etc/httpd/conf/httpd.conf
 RUN echo " " >> /etc/httpd/conf/httpd.conf
 RUN echo "##################################" >> /etc/httpd/conf/httpd.conf
-####this is the virtual host configuration for the projects
+####this is the default virtual host configuration for the projects
 RUN echo "<VirtualHost *:8091>" >> /etc/httpd/conf/httpd.conf
 RUN echo "DocumentRoot /var/www/html" >> /etc/httpd/conf/httpd.conf
 RUN echo "ServerName 172.105.51.125" >> /etc/httpd/conf/httpd.conf
@@ -67,14 +48,41 @@ RUN sed -i 's/Options MultiViews Indexes SymLinksIfOwnerMatch IncludesNoExec/All
 RUN sed -i 's/Require method GET POST OPTIONS/Require all granted/g' /etc/httpd/conf.d/userdir.conf
 RUN sed -i 's/UserDir disabled/# UserDir disabled/g' /etc/httpd/conf.d/userdir.conf
 RUN sed -i 's/#UserDir public_html/UserDir public_html/g' /etc/httpd/conf.d/userdir.conf
+#### phpmyadmin custom option ######################################################
+RUN sed -i 's/Require ip 127.0.0.1/Require all granted/g' /etc/httpd/conf.d/phpMyAdmin.conf 
+RUN sed -i 's/Require ip ::1/#Require ip ::1/g' /etc/httpd/conf.d/phpMyAdmin.conf 
+#RUN sed -i 's/$cfg['Servers'][$i]['host']          = 'localhost';/$cfg['Servers'][$i]['host']          = '172.20.128.2';/g' /etc/phpMyAdmin/config.inc.php 
+#RUN sed -i 's/$cfg['Servers'][$i]['port']          = '';/$cfg['Servers'][$i]['port']          = '3306';/g' /etc/phpMyAdmin/config.inc.php
+### php environment custome options #########
+RUN sed -i 's/max_execution_time = 30/max_execution_time = 300/g' /etc/php.ini
+RUN sed -i 's/max_input_time = 60/max_input_time = 300/g' /etc/php.ini
+RUN sed -i 's/memory_limit = 128M/memory_limit = 2048M/g' /etc/php.ini
+###Exporting the port to the externel
+EXPOSE  8091
+EXPOSE  3306
+###Creating the new ssh user for accessing the application
+#RUN useradd -p $(openssl passwd -1 wordprestest) wordprestest
+RUN useradd wordprestest
+RUN echo "wordprestest:wordprestest" | chpasswd
+###Directory Environment for project
+RUN mkdir -p /home/wordprestest/{backups,public_html,logs,tmp}
+###Sample test file for testing the environment
+#RUN touch /home/wordprestest/public_html/index.html
+###adding the content to the sample file
+#RUN echo "this is the docker apache test page for wrdtstsite.edflix.ch site......" > /home/wordprestest/public_html/index.html
+###changing the ownership of the directories
+RUN chown -R wordprestest:wordprestest /home/wordprestest/
+###changing the permissions of the project directory
+RUN chmod -R 755 /home/wordprestest/
+RUN chmod -R 775 /home/wordprestest/public_html/
 ##################### wrdprstst.edflix.ch ##########################
 RUN touch /etc/httpd/conf.d/edflix.conf
 RUN echo "##### wrdprstst.edflix.ch ###########" >> /etc/httpd/conf.d/edflix.conf
 RUN echo "<VirtualHost *:8091>" >> /etc/httpd/conf.d/edflix.conf
-RUN echo "       DocumentRoot    /home/wordprestest1/public_html" >> /etc/httpd/conf.d/edflix.conf
+RUN echo "       DocumentRoot    /home/wordprestest/public_html" >> /etc/httpd/conf.d/edflix.conf
 RUN echo "       ServerName      wrdprstst.edflix.ch" >> /etc/httpd/conf.d/edflix.conf
-RUN echo "       ErrorLog        /home/wordprestest1/logs/edflix-error_log" >> /etc/httpd/conf.d/edflix.conf
-RUN echo "       TransferLog     /home/wordprestest1/logs/edflix-access_log" >> /etc/httpd/conf.d/edflix.conf
+RUN echo "       ErrorLog        /home/wordprestest/logs/edflix-error_log" >> /etc/httpd/conf.d/edflix.conf
+RUN echo "       TransferLog     /home/wordprestest/logs/edflix-access_log" >> /etc/httpd/conf.d/edflix.conf
 RUN echo "</VirtualHost>" >> /etc/httpd/conf.d/edflix.conf
 RUN echo "######################" >> /etc/httpd/conf.d/edflix.conf
 ##########################################################################################
