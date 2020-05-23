@@ -59,7 +59,7 @@ RUN sed -i 's/max_input_time = 60/max_input_time = 300/g' /etc/php.ini
 RUN sed -i 's/memory_limit = 128M/memory_limit = 2048M/g' /etc/php.ini
 ###Exporting the port to the externel
 EXPOSE  8091
-EXPOSE  3306
+#EXPOSE  3306
 ###Creating the new ssh user for accessing the application
 #RUN useradd -p $(openssl passwd -1 wordprestest) wordprestest
 RUN useradd wordprestest

@@ -49,7 +49,7 @@ RUN echo "</VirtualHost>" >> /etc/httpd/conf/httpd.conf
 ####################################################################################
 ###Exporting the port to the externel
 EXPOSE  8091
-EXPOSE  3306
+#EXPOSE  3306
 ###restarting the apache
 CMD ["/usr/sbin/httpd","-D","FOREGROUND"]
 #########################################################################################################
