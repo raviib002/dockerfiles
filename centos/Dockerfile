@@ -8,12 +8,14 @@ RUN yum install -y httpd httpd-tools
 RUN yum install -y lynx wget rsync vim bash-completion curl unzip net-tools git
 ###Mariadb cline install
 RUN touch /etc/yum.repos.d/mariadb.repo
-RUN echo "[mariadb]" >> /etc/yum.repos.d/mariadb.repo
-RUN echo "name = MariaDB" >> /etc/yum.repos.d/mariadb.repo
-RUN echo "baseurl = http://yum.mariadb.org/5.5/rhel7-amd64/" >> /etc/yum.repos.d/mariadb.repo
-RUN echo "gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB" >> /etc/yum.repos.d/mariadb.repo
-RUN echo "gpgcheck=1" >> /etc/yum.repos.d/mariadb.repo
-RUN yum install -y MariaDB-client
+RUN echo '[mariadb]' >> /etc/yum.repos.d/mariadb.repo
+RUN echo 'name = MariaDB' >> /etc/yum.repos.d/mariadb.repo
+RUN echo 'baseurl = http://yum.mariadb.org/5.5/rhel7-amd64/' >> /etc/yum.repos.d/mariadb.repo
+RUN echo 'gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB' >> /etc/yum.repos.d/mariadb.repo
+RUN echo 'gpgcheck=1' >> /etc/yum.repos.d/mariadb.repo
+RUN yum -y update
+#RUN yum install -y MariaDB-common
+#RUN yum install -y MariaDB-client
 ####Php environment create
 RUN wget -q http://rpms.remirepo.net/enterprise/remi-release-7.rpm
 RUN wget -q https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
